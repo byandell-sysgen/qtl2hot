@@ -1,8 +1,8 @@
-Package: qtlhot
-Version: 1.1.0
-Date: 2020-03-02
+Package: qtl2hot
+Version: 1.2.0
+Date: 2024-07-15
 Author: Elias Chaibub Neto <echaibub@hotmail.com> and Brian S Yandell <brian.yandell@wisc.edu>
-Title: Inference for QTL Hotspots
+Title: Inference for Hotspots with QTL2
 Description: Functions to infer co-mapping trait hotspots and causal models.
   Chaibub Neto E, Keller MP, Broman AF, Attie AD, Jansen RC, Broman KW, Yandell BS (2012) 
   Quantile-based permutation thresholds for QTL hotspots. Genetics 191 : 1355-1365. 
@@ -11,8 +11,10 @@ Description: Functions to infer co-mapping trait hotspots and causal models.
   Modeling causality for pairs of phenotypes in system genetics. Genetics 193 : 1003-1013.
   <doi:10.1534/genetics.112.147124>.
 Maintainer: Brian S. Yandell <brian.yandell@wisc.edu>
-Depends: stats,qtl,mnormt,utils,corpcor,
+Depends: 
   R (>= 2.10)
+Imports:
+  corpcor, mnormt, qtl2, stats, utils
 LazyLoad: yes
 LazyData: yes
 License: GPL (>= 2)

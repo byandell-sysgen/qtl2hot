@@ -19,8 +19,22 @@
 #           mySimulations, sim.hotspot
 ######################################################################
 
-## Generates a "null dataset" cross
-##
+#' Simulate Null Dataset R/qtl Cross Object
+#'
+#' @param chr.len vector of chromosome lengths
+#' @param n.mar number of markers
+#' @param n.ind number of individuals
+#' @param type cross type
+#' @param n.pheno number of phenotypes
+#' @param latent.eff latent effect
+#' @param res.var residual variance
+#' @param init.seed initial random seed
+#'
+#' @return R/qtl cross object
+#' @export
+#' @importFrom qtl calc.genoprob sim.cross sim.map
+#' @importFrom stats rnorm
+#' 
 sim.null.cross <- function(chr.len = rep(400,16), n.mar=185, n.ind = 112, type = "bc",
                            n.pheno = 6000, latent.eff = 1.5, res.var = 1,
                            init.seed = 92387475)
@@ -44,22 +58,28 @@ sim.null.pheno.data <- function(cross, n.pheno, latent.eff, res.var)
   cross
 }
 
-## Generate hotspots for the simulated examples in the manuscript.
+#' Generate hotspots for the simulated examples in the manuscript.
+#'
+#' @param cross R/qtl cross object
+#' @param hotspotinfo data frame of hotspot info
+#' @param Q.eff QTL effect
+#' @param latent.eff latent effect
+#' @param res.var 
+#' @param n.pheno 
+#' @param init.seed 
+#'
+#' @return R/qtl cross object
+#' @export
+#' @rdname sim.null.cross
 include.hotspots <- function(cross,
-                             hchr,
-                             hpos,
-                             hsize,
+                             hotspotinfo,
                              Q.eff,
                              latent.eff,
-                             lod.range.1,
-                             lod.range.2,
-                             lod.range.3,
-                             res.var=1,
+                             res.var = 1,
                              n.pheno,
                              init.seed)
 {
-  get.closest.pos.nms <- function(pos, cross, chr)
-  {
+  get.closest.pos.nms <- function(pos, cross, chr) {
     ## map <- attributes(cross$geno[[chr]]$prob)$map
     ## This can be simplified.
     map <- attributes(cross$geno[[chr]]$prob)$map
@@ -71,33 +91,27 @@ include.hotspots <- function(cross,
     nms <- q.nms[tmp]
     list(nms,closest.pos)
   }
-  pull.prob <- function(cross)
-  {
+  pull.prob <- function(cross) {
     out <- vector(mode = "list", length = qtl::nchr(cross))
     names(out) <- names(cross$geno)
     for(i in names(out))
       out[[i]] <- cross$geno[[i]]$prob  
     out
   }
-  get.qtl.eff <- function(n, lod, res.var, latent.eff, Q.eff)
-  {
-##    lod <- stats::runif(hsize, lod.range[1], lod.range[2])
-##    r2 <- 1 - 10 ^ (-2 * lod / qtl::nind(cross))
-##    beta <- sqrt(r2 * res.var * (1 + latent.eff ^ 2) / (Q.eff ^ 2 * (1 - r2) - res.var * r2))
+  get.qtl.eff <- function(n, lod, res.var, latent.eff, Q.eff) {
     r2 <- 1 - 10^(-2*lod/n)
     sqrt(r2*(1 + latent.eff^2)/(Q.eff^2*(1 - r2) - r2))
   }
-  update.pheno <- function(cross, hchr, hpos, hsize, Q.eff, latent.eff, lod.range,
-                           res.var, index, hk.prob)
-  {
+  update.pheno <- function(cross, hchr, hpos, hsize, Q.eff, latent.eff,
+                           minlod, maxlod,
+                           res.var, index, hk.prob) {
     M.pos <- get.closest.pos.nms(hpos, cross, hchr)[[1]]
     M.dummy <- hk.prob[[hchr]][, M.pos, 1] - hk.prob[[hchr]][, M.pos, 2]
     M <- M.dummy * Q.eff + stats::rnorm(qtl::nind(cross), 0, sqrt(res.var))
 
     ## QTL effect
     beta <- get.qtl.eff(n = qtl::nind(cross),
-                        lod = stats::runif(hsize, lod.range[1], 
-                                           lod.range[2]),
+                        lod = stats::runif(hsize, minlod, maxlod),
                         res.var,
                         latent.eff,
                         Q.eff)
@@ -111,25 +125,90 @@ include.hotspots <- function(cross,
   set.seed(init.seed)
   hk.prob <- pull.prob(cross)
 
-  ## Why 50 for first, 500 for 2nd and 3rd?
-  ## Why strange lod.range for 2nd?
-  index1 <- sample(1:n.pheno, hsize[1], replace = FALSE)
-  cross <- update.pheno(cross, hchr[1], hpos[1], hsize[1], Q.eff, latent.eff,
-                        lod.range.1, res.var, index1, hk.prob)
-
-  index2 <- sample((1:n.pheno)[-index1], hsize[2], replace = FALSE)
-  cross <- update.pheno(cross, hchr[2], hpos[2], hsize[2], Q.eff, latent.eff,
-                        lod.range.2, res.var, index2, hk.prob)
-
-  index3 <- sample((1:n.pheno)[-c(index1, index2)], hsize[3], replace = FALSE)
-  cross <- update.pheno(cross, hchr[3], hpos[3], hsize[3], Q.eff, latent.eff,
-                        lod.range.3, res.var, index3, hk.prob)
-
+  indices <- 1:n.pheno
+  for(i in seq_len(nrow(hotspotinfo))) {
+    index <- sample(indices, hotspotinfo$size[i], replace = FALSE)
+    cross <- update.pheno(cross, hotspotinfo$chr[i], hotspotinfo$pos[i],
+                          hotspotinfo$size[i], Q.eff, latent.eff,
+                          hotspotinfo$minlod[i], hotspotinfo$maxlod[i],
+                          res.var, index, hk.prob)
+    indices <- indices[-match(index, indices)]
+  }
   cross
 }
 #################################################################################
 mySimulations <- function(...) sim.hotspot(...)
 #################################################################################
+
+
+#' Wrapper routine for simulations.
+#' 
+#' Wrapper routine for simulations
+#' 
+#' Simulate \code{nSim} realizations of cross object with \code{n.pheno}
+#' phenotypes with correlation \code{latent.eff}. All simulations use the same
+#' genotypes in the \code{cross} object.
+#' 
+#' @aliases sim.hotspot mySimulations sim.null.cross sim.null.pheno.data
+#' include.hotspots
+#' @param nSim Number of simulated sets of phenotypes to create. See details.
+#' @param cross Object of class \code{cross}. See
+#' \code{\link[qtl]{read.cross}}.
+#' @param n.pheno Number of traits, or phenotypes, to simulate for cross
+#' object.
+#' @param latent.eff Strength of latent effect, which is included in all
+#' traits. See \code{\link{sim.null.cross}}.
+#' @param res.var Residual variance for traits. Should not affect results.
+#' @param n.quant maximum size of hotspots examined; ideally large enough to
+#' exceed the largest Breitling alpha critical value.
+#' @param n.perm Number of permutations to perform per realization. Good idea
+#' to do 1000, but this takes time.
+#' @param alpha.levels Vector of significance levels.
+#' @param lod.thrs Vector of LOD thresholds, typically single-trait permutation
+#' thresholds for various significance levels.
+#' @param drop.lod Drop in LOD score examined. LODs below this drop from the
+#' maximum for a chromosome will not be scored.
+#' @param init.seed initial seed for pseudo-random number generation
+#' @param chr.len vector of chromosome lengths
+#' @param n.mar number of markers
+#' @param n.ind number of individuals
+#' @param type type of cross
+#' @param hchr,hpos,hsize vectors for hotspot chromosomes, positions, and sizes
+#' @param Q.eff QTL effect
+#' @param lod.range list of 2-vectors of LOD ranges
+#' @param verbose Verbose output if \code{TRUE}. More detailed output if
+#' \code{2}.
+#' @param \dots Arguments passed directly to \code{sim.hotspot}.
+#' @return \code{sim.null.cross} simulates an object of class \code{cross}.
+#' \code{sim.null.pheno.data} simulates a data frame of phenotypes.
+#' \code{sim.hotspot} uses these other routines to simulate a hotspot,
+#' returning an list object.
+#' @author Elias Chaibub Neto and Brian S. Yandell
+#' @seealso \code{\link{sim.null.cross}}, \code{\link[qtl]{read.cross}}.
+#' @keywords utilities
+#' @examples
+#' 
+#' ncross1 <- sim.null.cross(chr.len = rep(100, 4),
+#'                           n.mar = 51,
+#'                           n.ind = 100,
+#'                           type = "bc",
+#'                           n.phe = 1000,
+#'                           latent.eff = 3,
+#'                           res.var = 1,
+#'                           init.seed = 123457)
+#' cross1 <- include.hotspots(cross = ncross1,
+#'                            hotspotinfo = data.frame(
+#'                              chr = c(2, 3, 4),
+#'                              hpos = c(25, 75, 50),
+#'                              size = c(100, 50, 20),
+#'                              minlod = c(2.5, 5, 10),
+#'                              maxlod = c(2.5, 8, 15)),
+#'                            Q.eff = 2,
+#'                            latent.eff = 3,
+#'                            res.var = 1,
+#'                            n.phe = 1000,
+#'                            init.seed = 12345)
+#' 
 sim.hotspot <- function(nSim, 
                         cross, 
                         n.pheno,

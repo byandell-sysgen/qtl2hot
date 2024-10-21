@@ -282,6 +282,43 @@ mySimulations <- function(
        pval.cit=pval.cit)
 }
 #########################################################################
+
+
+#' Simulate Cross for Causal Tests
+#' 
+#' Creates cross with certain pattern of dependence across phenotypes.
+#' 
+#' 
+#' @aliases SimCrossCausal SimCrossIndep CMSTCross
+#' @param n.ind number of individuals to simulate
+#' @param len vector specifying the chromosome lengths (in cM)
+#' @param n.mar vector specifying the number of markers per chromosome
+#' @param beta causal effect (slope) of first phenotype on others
+#' @param add.eff,add.eff.1,add.eff.h additive genetic effect
+#' @param dom.eff,dom.eff.1,dom.eff.h dominance genetic effect
+#' @param sig2.1 residual variance for first phenotype
+#' @param sig2.2,sig2.h residual variance for all other phenotypes
+#' @param eq.spacing if \code{TRUE}, markers will be equally spaced
+#' @param cross.type type of cross (\code{bc} and \code{f2} for now)
+#' @param normalize normalize values if \code{TRUE}
+#' @references Chaibub Neto E, Broman AT, Keller MP, Attie AD, Zhang B, Zhu J,
+#' Yandell BS, Causal model selection hypothesis tests in systems genetics.
+#' Genetics (in review).
+#' @keywords utilities
+#' @examples
+#' 
+#' set.seed(987654321)
+#' CMSTCross <- SimCrossCausal(n.ind = 100, 
+#'   len = rep(100, 3), n.mar = 101,
+#'   beta = rep(0.5, 2), add.eff = 1, dom.eff = 0, 
+#'   sig2.1 = 0.4, sig2.2 = 0.1, eq.spacing = FALSE, 
+#'   cross.type = "bc", normalize = TRUE)
+#' CMSTCross <- calc.genoprob(CMSTCross, step = 1)
+#' \dontrun{
+#' save(CMSTCross, file = "CMSTCross.RData", compress = TRUE)
+#' }
+#' 
+#' @export SimCrossCausal
 SimCrossCausal <- function(n.ind, len, n.mar, beta, add.eff, dom.eff, 
                            sig2.1 = 1, sig2.2 = 1, eq.spacing = FALSE, 
                            cross.type = c("bc", "f2"), normalize = FALSE) {

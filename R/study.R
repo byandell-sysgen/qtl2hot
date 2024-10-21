@@ -106,6 +106,42 @@ get.hotspot <- function(filenames,
        thrWW=thrWW)  
 }
 ########################################################################################
+
+
+#' Summary of threshold results
+#' 
+#' Summary of threshold results.
+#' 
+#' 
+#' @param cross object of class \code{cross}; see \code{\link[qtl]{read.cross}}
+#' @param pheno.col phenotype columns used for filtering thresholds
+#' @param latent.eff ratio of latent effect SD to residual SD
+#' @param res.var residual variance (=SD^2)
+#' @param lod.thrs LOD threshold values for range of significance (alpha)
+#' levels
+#' @param drop.lod LOD drop from max LOD to keep in analysis
+#' @param s.quant vector of \code{1:Nmax} with \code{Nmax} the maximum hotspot
+#' size to be considered
+#' @param n.perm number of permutations
+#' @param alpha.levels range of significance levels; same length as
+#' \code{lod.thrs}
+#' @param qh.thrs Results of call to \code{\link{hotperm}}
+#' @param ww.thrs Results of call to \code{\link{ww.perm}}
+#' @param addcovar additive covariates as vector or matrix; see
+#' \code{\link[qtl]{scanone}}
+#' @param intcovar interactive covariates as vector or matrix; see
+#' \code{\link[qtl]{scanone}}
+#' @param verbose verbose output if \code{TRUE}
+#' @param \dots arguments passed along to \code{scanone}
+#' @return List with items \item{NL.thrs}{} \item{N.thrs}{} \item{WW.thrs}{}
+#' \item{NL}{} \item{N.counts}{} \item{WW.counts}{}
+#' @seealso \code{\link{hotperm}}, \code{\link{ww.perm}},
+#' \code{\link[qtl]{scanone}}
+#' @references Manichaikul A, Dupuis J, Sen S, Broman KW (2006) Poor
+#' performance of bootstrap confidence intervals for the location of a
+#' quantitative trait locus. Genetics 174: 481-489.
+#' @keywords utilities
+#' @export filter.threshold
 filter.threshold <- function(cross, pheno.col, latent.eff, res.var,
                              lod.thrs, drop.lod = 1.5,
                              s.quant, n.perm, alpha.levels,

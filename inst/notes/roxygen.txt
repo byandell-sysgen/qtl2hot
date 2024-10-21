@@ -1,0 +1,184 @@
+Rd2roxygen::Rd2roxygen(".")
+Loading required package: .
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: add.phenos.Rd
+looking for the object 'add.phenos' in:
+  add.phenos.R: line 21
+./R/add.phenos.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: CMSTtests.Rd
+looking for the object 'CMSTtests' in:
+  add.phenos.R: not found
+  big.R: not found
+  cmst.R: line 3
+./R/cmst.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: filter.threshold.Rd
+looking for the object 'filter.threshold' in:
+  add.phenos.R: not found
+  big.R: not found
+  cmst.R: not found
+  highlod.R: not found
+  hotperm.R: not found
+  hotsize.R: not found
+  max.R: not found
+  multiple_testing_sim_functions.R: not found
+  neqtl.R: not found
+  parallel.R: not found
+  plotcmst.R: not found
+  ravel.R: not found
+  roc.R: not found
+  rug.R: not found
+  runningmean.R: not found
+  simcmst.R: not found
+  simhot.R: not found
+  sliding.R: not found
+  study.R: line 109
+./R/study.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: GetCandReg.Rd
+looking for the object 'GetCandReg' in:
+  add.phenos.R: not found
+  big.R: not found
+  cmst.R: line 1732
+./R/cmst.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: GetCommonQtls.Rd
+looking for the object 'GetCommonQtls' in:
+  add.phenos.R: not found
+  big.R: not found
+  cmst.R: line 1126
+./R/cmst.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: highlod.Rd
+looking for the object 'highlod' in:
+  highlod.R: line 24
+./R/highlod.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: hotperm.Rd
+looking for the object 'hotperm' in:
+  hotperm.R: line 33
+./R/hotperm.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: hotsize.Rd
+looking for the object 'hotsize' in:
+  hotsize.R: line 21
+./R/hotsize.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: parallel.qtlhot.Rd
+looking for the object 'parallel.qtlhot' in:
+  add.phenos.R: not found
+  big.R: not found
+  cmst.R: not found
+  highlod.R: not found
+  hotperm.R: not found
+  hotsize.R: not found
+  max.R: not found
+  multiple_testing_sim_functions.R: not found
+  neqtl.R: not found
+  parallel.R: line 35
+./R/parallel.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: PrecTpFpMatrix.Rd
+looking for the object 'PrecTpFpMatrix' in:
+  add.phenos.R: not found
+  big.R: not found
+  cmst.R: line 1708
+./R/cmst.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: sim.hotspot.Rd
+looking for the object 'sim.hotspot' in:
+  add.phenos.R: not found
+  big.R: not found
+  cmst.R: not found
+  highlod.R: not found
+  hotperm.R: not found
+  hotsize.R: not found
+  max.R: not found
+  multiple_testing_sim_functions.R: not found
+  neqtl.R: not found
+  parallel.R: not found
+  plotcmst.R: not found
+  ravel.R: not found
+  roc.R: not found
+  rug.R: not found
+  runningmean.R: not found
+  simcmst.R: not found
+  simhot.R: line 133
+./R/simhot.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: SimCrossCausal.Rd
+looking for the object 'SimCrossCausal' in:
+  add.phenos.R: not found
+  big.R: not found
+  cmst.R: not found
+  highlod.R: not found
+  hotperm.R: not found
+  hotsize.R: not found
+  max.R: not found
+  multiple_testing_sim_functions.R: not found
+  neqtl.R: not found
+  parallel.R: not found
+  plotcmst.R: not found
+  ravel.R: not found
+  roc.R: not found
+  rug.R: not found
+  runningmean.R: not found
+  simcmst.R: line 285
+./R/simcmst.R updated
+
+
+##------ Tue Jul 16 11:49:38 2024 ------##
+parsed: westwu.Rd
+looking for the object 'ww.perm' in:
+  add.phenos.R: not found
+  big.R: not found
+  cmst.R: not found
+  highlod.R: not found
+  hotperm.R: not found
+  hotsize.R: not found
+  max.R: not found
+  multiple_testing_sim_functions.R: not found
+  neqtl.R: not found
+  parallel.R: not found
+  plotcmst.R: not found
+  ravel.R: not found
+  roc.R: not found
+  rug.R: not found
+  runningmean.R: not found
+  simcmst.R: not found
+  simhot.R: not found
+  sliding.R: not found
+  study.R: not found
+  utilcmst.R: not found
+  utilhot.R: not found
+  westwu.R: line 33
+./R/westwu.R updated
+
+
+Warning message:
+In library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE,  :
+  there is no package called ‘.’
+> 

@@ -30,6 +30,59 @@
 ## "alphas", one for the QTL mapping (the LOD thresholds) and one for the 
 ## permutation significance (alpha levels). 
 ##
+
+
+#' Conduct NL and N permutation tests
+#' 
+#' Conduct NL and N permutation tests.
+#' 
+#' 
+#' @aliases hotperm print.hotperm summary.hotperm quantile.hotperm
+#' print.summary.hotperm hotperm1
+#' @param cross object of class \code{cross}
+#' @param n.quant maximum of \code{s.quant}
+#' @param n.perm number of permutations
+#' @param lod.thrs vector of LOD thresholds
+#' @param alpha.levels vector of significance levels
+#' @param quant.levels quantile levels, as number of traits, to show in
+#' summary; default is 1, 2, 5, 10, \dots up to maximum recorded
+#' @param drop.lod LOD drop amount for support intervals
+#' @param window window size for smoothed hotspot size
+#' @param verbose verbose output if \code{TRUE}
+#' @param init.seed initial seed for pseudo-random number generation
+#' @param x,object object of class \code{hotperm} or \code{summary.hotperm}
+#' @param probs probability levels for quantiles (\code{1-probs} if all > 0.5);
+#' default is \code{alpha.levels}
+#' @param lod.thr restrict to values above this if not \code{NULL}
+#' @param addcovar additive covariates as vector or matrix; see
+#' \code{\link[qtl]{scanone}}
+#' @param intcovar interactive covariates as vector or matrix; see
+#' \code{\link[qtl]{scanone}}
+#' @param \dots arguments passed along to \code{scanone}
+#' @author Elias Chaibub Neto and Brian S Yandell
+#' @keywords utilities
+#' @examples
+#' 
+#' example(include.hotspots)
+#' set.seed(123)
+#' pt <- scanone(ncross1, method = "hk", n.perm = 1000)
+#' alphas <- seq(0.01, 0.10, by=0.01)
+#' lod.thrs <- summary(pt, alphas)
+#' \dontrun{
+#' ## This takes awhile, so we save the object.
+#' set.seed(12345)
+#' hotperm1 <- hotperm(cross = cross1,
+#'                     n.quant = 300,
+#'                     n.perm = 100,
+#'                     lod.thrs = lod.thrs,
+#'                     alpha.levels = alphas,
+#'                     drop.lod = 1.5,
+#'                     verbose = FALSE)
+#' save(hotperm1, file = "hotperm1.RData", compress = TRUE)
+#' }
+#' summary(hotperm1)
+#' 
+#' @export hotperm
 hotperm <- function(cross, n.quant, n.perm, lod.thrs, alpha.levels, drop.lod = 1.5,
                     window = NULL, verbose = FALSE, init.seed = 0,
                     addcovar = NULL, intcovar = NULL, ...) 
@@ -105,7 +158,9 @@ hotperm <- function(cross, n.quant, n.perm, lod.thrs, alpha.levels, drop.lod = 1
   
   out
 }
+#' @method print hotperm
 print.hotperm <- function(x, ...) print(summary(x, ...))
+#' @method summary hotperm
 summary.hotperm <- function(object, quant.levels, ...)
 {
   out <- quantile(object, ...)
@@ -129,6 +184,63 @@ summary.hotperm <- function(object, quant.levels, ...)
   class(out) <- c("summary.hotperm", class(out))
   out
 }
+#' @method quantile hotperm
+#' @export
+#' @rdname highlod
+quantile.hotperm <- function(x, probs = attr(x, "alpha.levels"),
+                             ..., lod.thr = NULL)
+{
+  if(max(probs) <= 0.5)
+    probs <- 1 - probs
+  
+  myquant <- function(x, probs) {
+    x[is.na(x)] <- 0
+    out <- as.matrix(apply(x, 2, quantile, probs = probs))
+    if(length(probs) > 1)
+      out <- t(out)
+    out
+  }
+  
+  out <- list()
+  prob.names <- paste(100 * signif(probs, 3), "%", sep = "")
+  
+  ## max.N
+  out$max.N <- myquant(x$max.N, probs)
+  dimnames(out$max.N) <- list(signif(attr(x, "lod.thrs"), 3), prob.names)
+  
+  ## max.N.window
+  if(!is.null(x$max.N.window)) {
+    out$max.N.window <- t(myquant(x$max.N.window, probs))
+    dimnames(out$max.N.Window) <- dimnames(out$max.N)
+  }
+  
+  ## max.lod.quant
+  if(!is.null(x$max.lod.quant)) {
+    quant <- myquant(x$max.lod.quant, probs)
+    if(!is.null(lod.thr)) {
+      tmp <- quant <= min(lod.thr) & quant > 0
+      if(any(tmp))
+        quant[tmp] <- 0
+      first.zero <- apply(quant, 2,
+                          function(x) {
+                            z <- x == 0
+                            if(any(z))
+                              min(which(z))
+                            else
+                              0
+                          })
+      offset <- nrow(quant) * (seq(ncol(quant)) - 1)
+      first.zero <- first.zero[first.zero > 0] + offset[first.zero > 0]
+      quant[first.zero] <- min(lod.thr)
+    }
+    dimnames(quant) <- list(as.character(dimnames(x$max.lod.quant)[[2]]), prob.names)
+    quant <- quant[apply(quant, 1, function(x) any(x > 0)),, drop = FALSE]
+    quant[quant == 0] <- NA
+    out$max.lod.quant <- quant
+  }
+  out
+}
+#' @method print.summary hotperm
 print.summary.hotperm <- function(x, ...)
 {
   cat("max.N: hotspot threshold by single-trait LOD threshold and significance level\n")
@@ -143,6 +255,7 @@ print.summary.hotperm <- function(x, ...)
   print(round(x$max.lod.quant, 2))
   invisible()
 }
+#' @method plot hotperm
 plot.hotperm <- function(x, probs = seq(0.9, 0.99, by = 0.01), level = 0.95, ...)
 {
   lod.thrs <- attr(x, "lod.thrs")
